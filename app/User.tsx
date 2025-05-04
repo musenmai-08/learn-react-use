@@ -13,6 +13,9 @@ function fetchData(id: number, signal?: AbortSignal): Promise<UserType> {
 		}
 		const data = await res.json();
 
+		// 遅延を追加
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+
 		return data;
 	})();
 }
