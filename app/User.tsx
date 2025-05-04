@@ -3,18 +3,18 @@ import { useState } from "react";
 import { User as UserType } from "./types";
 
 function fetchData(id: number, signal?: AbortSignal): Promise<UserType> {
-	return fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
-		signal,
-	})
-		.then((res) => {
-			if (!res.ok) {
-				throw new Error(`userIdが${id}のユーザーデータを取得できませんでした`);
-			}
-			return res.json();
-		})
-		.catch((error) => {
-			throw error;
-		});
+	return (async () => {
+		const res = await fetch(
+			`https://jsonplaceholder.typicode.com/users/${id}`,
+			{ signal }
+		);
+		if (!res.ok) {
+			throw new Error(`userIdが${id}のユーザーデータを取得できませんでした`);
+		}
+		const data = await res.json();
+
+		return data;
+	})();
 }
 
 export default function User() {
@@ -40,7 +40,7 @@ export default function User() {
 
 	return (
 		<>
-			<input type="number" onChange={onChange} />
+			<input type="number" onChange={onChange} defaultValue={0} />
 			<div>{user && <p>{user.name}</p>}</div>
 			{error && <div>エラー：{error}</div>}
 		</>
