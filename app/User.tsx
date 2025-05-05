@@ -1,24 +1,36 @@
-import { cache, use } from "react";
+"use client";
+
+import { use, useState } from "react";
 import { User as UserType } from "./types";
 
-const fetchData = cache(async () => {
-	const res = await fetch(`https://jsonplaceholder.typicode.com/users`);
-	if (!res.ok) throw new Error("error");
+export default function User({
+	usersPromise,
+}: {
+	usersPromise: Promise<UserType[]>;
+}) {
+	const [userId, setUserId] = useState(1);
 
-	await new Promise((resolve) => setTimeout(resolve, 1000));
+	const users: UserType[] = use(usersPromise);
+	const user = users.find((target) => target.id === userId);
 
-	return res.json();
-});
-
-export default function User() {
-	const users: UserType[] = use(fetchData());
+	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setUserId(Number(e.target.value));
+	};
 
 	return (
 		<div>
-			<ul>
-				<li>{users[0].name}</li>
-				<li>{users[0].email}</li>
-			</ul>
+			<div>
+				<input type="number" onChange={onChange} defaultValue={1} />
+			</div>
+
+			{user ? (
+				<ul>
+					<li>{user.name}</li>
+					<li>{user.email}</li>
+				</ul>
+			) : (
+				<>入力されたIDのユーザーは存在しません</>
+			)}
 		</div>
 	);
 }

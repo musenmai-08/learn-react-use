@@ -1,57 +1,28 @@
-// "use client";
 import { Suspense } from "react";
 import User from "./User";
+import { User as UserType } from "./types";
 
-// function fetchData(id: number, signal?: AbortSignal): Promise<UserType> {
-// 	return (async () => {
-// 		const res = await fetch(
-// 			`https://jsonplaceholder.typicode.com/users/${id}`,
-// 			{ signal }
-// 		);
-// 		if (!res.ok) {
-// 			throw new Error(`userIdが${id}のユーザーデータを取得できませんでした`);
-// 		}
-// 		const data = await res.json();
+async function fetchAllUsers(): Promise<UserType[]> {
+	const res = await fetch("https://jsonplaceholder.typicode.com/users");
 
-// 		// 遅延を追加
-// 		await new Promise((resolve) => setTimeout(resolve, 1000));
+	if (!res.ok) {
+		throw new Error("ユーザーデータの取得に失敗しました");
+	}
 
-// 		return data;
-// 	})();
-// }
+	// 遅延処理
+	await new Promise((resolve) => setTimeout(resolve, 1000));
 
-export default function Users() {
-	// const [user, setUser] = useState<UserType | null>(null);
-	// const [error, setError] = useState<string>("");
+	return res.json();
+}
 
-	// const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	const controller = new AbortController();
-	// 	try {
-	// 		const data = await fetchData(Number(e.target.value), controller.signal);
-	// 		setUser(data);
-	// 		setError("");
-	// 		console.log(data);
-	// 	} catch (error: unknown) {
-	// 		setUser(null);
-	// 		if (error instanceof Error) {
-	// 			setError(error.message);
-	// 		} else {
-	// 			setError("予期せぬエラーが発生しました");
-	// 		}
-	// 	}
-	// };
+export default async function Users() {
+	const usersPromise = fetchAllUsers();
 
 	return (
 		<>
-			{/* <div>
-				<input type="number" onChange={onChange} defaultValue={1} />
-			</div> */}
-
 			<Suspense fallback={<>Loading...</>}>
-				<User />
+				<User usersPromise={usersPromise} />
 			</Suspense>
-
-			{/* {error && <div>エラー：{error}</div>} */}
 		</>
 	);
 }
